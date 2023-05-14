@@ -60,4 +60,8 @@ export class MatchRepository {
       );
     }
   }
+
+  async updateDate(matchId: ObjectId, newDate: string) {
+    await this.match.updateOne({ _id: matchId }, { startDate: newDate });
+  }
 }

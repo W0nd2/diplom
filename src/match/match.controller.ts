@@ -99,7 +99,7 @@ export class MatchController {
   }
 
   @Put(':matchId')
-  async updateMatch(
+  async updateTeam(
     @Param('matchId', ValidateMongooseIdPipe) matchId: ObjectId,
     @Body() dto: UpdateMatchDto,
   ) {
@@ -111,5 +111,24 @@ export class MatchController {
       throw new HttpException('Match with such id does not exists', 400);
     }
     await this.matchService.updateTeam(dto);
+  }
+
+  @Put(':matchId/:newDate')
+  async updateDate(
+    @Param('matchId', ValidateMongooseIdPipe) matchId: ObjectId,
+    @Param('newDate') newDate: string,
+  ) {
+    if (!matchId) {
+      throw new HttpException('Incorrect teamId', 400);
+    }
+    const date = new Date(newDate);
+    if (isNaN(date.getTime())) {
+      throw new HttpException('This date is invalid', 400);
+    }
+    const match = await this.matchService.getMatchById(matchId);
+    if (!match) {
+      throw new HttpException('Match with such id does not exists', 400);
+    }
+    await this.matchService.updateDate(matchId, newDate);
   }
 }

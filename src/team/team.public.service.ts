@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongoose';
 import { TeamService } from './team.service';
-import { GetTeamResponseDto } from '../team-public-contract/dto/team.public.response.dto';
 import { ITeamPublicService } from '../team-public-contract/team.public.service.interface';
 
 @Injectable()

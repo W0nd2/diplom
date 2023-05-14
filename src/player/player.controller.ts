@@ -8,7 +8,10 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { PlayerRepository } from './player.repository';
 import { PlayerService } from './player.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
@@ -16,6 +19,8 @@ import * as bcryptjs from 'bcryptjs';
 import { ToNumberPipe } from '../pipes/to-number.pipe';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { ObjectId } from 'mongoose';
+import { IsLogedInGuard } from '../guards/is-loged-in.guard';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('player')
 export class PlayerController {
@@ -25,6 +30,7 @@ export class PlayerController {
     private readonly playerService: PlayerService,
   ) {}
 
+  @UseGuards(IsLogedInGuard)
   @Get()
   async getAllPlayers(
     @Query('limit', ToNumberPipe) limitQ = 9,
@@ -42,19 +48,33 @@ export class PlayerController {
     if (user) {
       throw new HttpException('This email or nickname is already in use', 400);
     }
-    //const userRole = await this.roleService.getRoleByName(RoleType.User);
-    //if (!userRole) throw new NotFoundException('The user role was not found');
     const hashPassword = await bcryptjs.hash(dto.password!, 5);
     const newUser = await this.playerRepository.createPlayer({
       ...dto,
       password: hashPassword,
-      //roleId: userRole.id,
+      roleId: '64556454c6c2cd57a207f2c5',
     });
-    return { message: 'Success registration!' };
-    //const token = this.userService.generateToken(newUser);
-    //return { token };
+    //return { message: 'Success registration!' };
+    const token = this.playerService.generateToken(newUser);
+    return { token };
   }
 
+  @Post('/login')
+  async login(@Body() dto: LoginDto): Promise<any> {
+    const user = await this.playerService.getPlayerByEmail(dto.email);
+    if (!user) throw new HttpException('Incorrect data', 400);
+    const comparePasswords = await bcryptjs.compare(
+      dto.password,
+      user.password,
+    );
+    if (!comparePasswords) throw new HttpException('Incorrect data', 400);
+    // const isBanned = await this.userService.isBanned(user._id);
+    // if (isBanned) throw new HttpException('You are banned', 403);
+    const token = this.playerService.generateToken(user);
+    return { token };
+  }
+
+  @UseGuards(IsLogedInGuard)
   @Delete(':playerId')
   async deletePlayerById(@Param('playerId') playerId: ObjectId) {
     if (!playerId) {
@@ -70,11 +90,15 @@ export class PlayerController {
     };
   }
 
+  @UseGuards(IsLogedInGuard)
   @Put(':playerId')
   async updatePlayerById(
     @Param('playerId') playerId: ObjectId,
     @Body() dto: UpdatePlayerDto,
+    @Req() req: Request,
   ) {
+    const userReq = req.user;
+    console.log(userReq);
     if (!playerId) {
       throw new HttpException('Incorrect playerId', 400);
     }
@@ -86,5 +110,21 @@ export class PlayerController {
     return {
       message: `Player with this id ${playerId} was updated successfully`,
     };
+  }
+
+  @UseGuards(IsLogedInGuard)
+  @Get('profile')
+  async getCurrentUser(@Req() req: Request) {
+    const userReq = req.user;
+    console.log(userReq);
+    if (!userReq) {
+      throw new HttpException('Access deny', 400);
+    }
+    const user = await this.playerRepository.getPlayerByEmail(userReq.email);
+    if (!user) {
+      throw new HttpException('No users with such id', 400);
+    }
+    const userInfo = await this.playerService.getUserInfo(user.id);
+    return userInfo;
   }
 }

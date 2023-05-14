@@ -50,4 +50,8 @@ export class MatchService {
   async updateTeam(data: UpdateMatchDto) {
     await this.matchRepository.updateTeam(data);
   }
+
+  async updateDate(matchId: ObjectId, newDate: string) {
+    await this.matchRepository.updateDate(matchId, newDate);
+  }
 }
