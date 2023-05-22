@@ -54,4 +54,8 @@ export class MatchService {
   async updateDate(matchId: ObjectId, newDate: string) {
     await this.matchRepository.updateDate(matchId, newDate);
   }
+
+  async getAllMatches(limit: number, offset: number) {
+    return this.matchRepository.getAllMatches(limit, offset);
+  }
 }

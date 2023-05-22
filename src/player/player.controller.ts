@@ -54,9 +54,10 @@ export class PlayerController {
       password: hashPassword,
       roleId: '64556454c6c2cd57a207f2c5',
     });
+    const role = await this.playerRepository.getRoleById(newUser.roleId);
     //return { message: 'Success registration!' };
     const token = this.playerService.generateToken(newUser);
-    return { token };
+    return { token, role };
   }
 
   @Post('/login')
@@ -70,8 +71,10 @@ export class PlayerController {
     if (!comparePasswords) throw new HttpException('Incorrect data', 400);
     // const isBanned = await this.userService.isBanned(user._id);
     // if (isBanned) throw new HttpException('You are banned', 403);
+    const role = await this.playerRepository.getRoleById(user.roleId);
     const token = this.playerService.generateToken(user);
-    return { token };
+
+    return { token, role };
   }
 
   @UseGuards(IsLogedInGuard)

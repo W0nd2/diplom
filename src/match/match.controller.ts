@@ -16,6 +16,7 @@ import { ITeamPublicService } from '../team-public-contract/team.public.service.
 import { ObjectId } from 'mongoose';
 import { ValidateMongooseIdPipe } from '../pipes/validate-mongoose-id.pipe';
 import { UpdateMatchDto } from './dto/update-match.dto';
+import { ToNumberPipe } from '../pipes/to-number.pipe';
 
 @Controller('match')
 export class MatchController {
@@ -130,5 +131,13 @@ export class MatchController {
       throw new HttpException('Match with such id does not exists', 400);
     }
     await this.matchService.updateDate(matchId, newDate);
+  }
+
+  @Get('all')
+  async getAllMatches(
+    @Query('limit', ToNumberPipe) limit = 9,
+    @Query('offset', ToNumberPipe) offset = 0,
+  ) {
+    return this.matchService.getAllMatches(limit, offset);
   }
 }

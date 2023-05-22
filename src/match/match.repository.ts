@@ -27,6 +27,10 @@ export class MatchRepository {
     ]);
   }
 
+  async getAllMatches(limit: number, offset: number) {
+    return this.match.find().skip(offset).limit(limit);
+  }
+
   async getMatchById(matchId: ObjectId) {
     return this.match.findOne({ _id: matchId });
   }

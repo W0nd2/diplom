@@ -7,8 +7,8 @@ import {
   Param,
   Post,
   Put,
-  Query,
-} from '@nestjs/common';
+  Query, UseGuards
+} from "@nestjs/common";
 import { TeamRepository } from './team.repository';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
@@ -18,6 +18,10 @@ import { ObjectId } from 'mongoose';
 import { ValidateMongooseIdPipe } from '../pipes/validate-mongoose-id.pipe';
 import { IPlayerPublicService } from '../player-public-contract/player.public.service.interface';
 import { ModuleRef } from '@nestjs/core';
+import { IsLogedInGuard } from "../guards/is-loged-in.guard";
+import { Roles } from "../decorators/roles.decorator";
+import { RoleType } from "../player/types/role.type";
+import { RolesGuard } from "../guards/roles.guard";
 
 @Controller('team')
 export class TeamController {
@@ -33,7 +37,8 @@ export class TeamController {
       'IPlayerPublicService',
     );
   }
-
+  @Roles([RoleType.Admin])
+  @UseGuards(RolesGuard)
   @Post('/create')
   async createTeam(@Body() dto: CreateTeamDto) {
     const team = await this.teamService.getTeamByName(dto.name);
@@ -51,7 +56,8 @@ export class TeamController {
   ) {
     return this.teamService.getAllTeams(limitQ, offsetQ);
   }
-
+  @Roles([RoleType.Admin])
+  @UseGuards(RolesGuard)
   @Delete(':teamId')
   async deleteTeam(@Param('teamId', ValidateMongooseIdPipe) teamId: ObjectId) {
     if (!teamId) {
@@ -66,7 +72,8 @@ export class TeamController {
       message: `Team with this id ${teamId} was deleted successfully`,
     };
   }
-
+  @Roles([RoleType.Admin])
+  @UseGuards(RolesGuard)
   @Put(':teamId')
   async updateTeam(
     @Param('teamId', ValidateMongooseIdPipe) teamId: ObjectId,
@@ -89,7 +96,7 @@ export class TeamController {
   async getTeamInfo(@Param('teamId', ValidateMongooseIdPipe) teamId: string) {
     return this.teamService.getTeamInfo(teamId);
   }
-
+  @UseGuards(IsLogedInGuard)
   @Post('/member/add/:playerId/:teamId')
   async addMemberToTeam(
     @Param('playerId', ValidateMongooseIdPipe) playerId: ObjectId,
@@ -121,7 +128,8 @@ export class TeamController {
       message: `Player added successfully`,
     };
   }
-
+  @Roles([RoleType.Admin])
+  @UseGuards(RolesGuard)
   @Delete('/member/delete/:playerId/:teamId')
   async deleteMemberFromTeam(
     @Param('playerId', ValidateMongooseIdPipe) playerId: ObjectId,
