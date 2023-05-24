@@ -1,17 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, ObjectId, SchemaTypes } from 'mongoose';
 
 export type MatchDocument = Match & Document;
 @Schema()
 export class Match implements IMatch {
-  @Prop({ required: true })
-  firstTeam: string;
+  @Prop({ required: true, type: SchemaTypes.ObjectId })
+  firstTeam: ObjectId;
 
-  @Prop({ required: true })
-  secondTeam: string;
+  @Prop({ required: true, type: SchemaTypes.ObjectId })
+  secondTeam: ObjectId;
 
-  @Prop()
-  won: string;
+  @Prop({ type: SchemaTypes.ObjectId })
+  winner: ObjectId;
 
   @Prop({ required: true })
   startDate: Date;
@@ -20,8 +20,8 @@ export class Match implements IMatch {
 export const MatchSchema = SchemaFactory.createForClass(Match);
 
 export interface IMatch {
-  firstTeam: string;
-  secondTeam: string;
-  won: string;
+  firstTeam: ObjectId;
+  secondTeam: ObjectId;
+  winner: ObjectId;
   startDate: Date;
 }

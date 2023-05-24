@@ -7,7 +7,8 @@ import {
   Param,
   Post,
   Put,
-  Query, UseGuards
+  Query, Req,
+  UseGuards
 } from "@nestjs/common";
 import { TeamRepository } from './team.repository';
 import { TeamService } from './team.service';
@@ -18,10 +19,11 @@ import { ObjectId } from 'mongoose';
 import { ValidateMongooseIdPipe } from '../pipes/validate-mongoose-id.pipe';
 import { IPlayerPublicService } from '../player-public-contract/player.public.service.interface';
 import { ModuleRef } from '@nestjs/core';
-import { IsLogedInGuard } from "../guards/is-loged-in.guard";
-import { Roles } from "../decorators/roles.decorator";
-import { RoleType } from "../player/types/role.type";
-import { RolesGuard } from "../guards/roles.guard";
+import { IsLogedInGuard } from '../guards/is-loged-in.guard';
+import { Roles } from '../decorators/roles.decorator';
+import { RoleType } from '../player/types/role.type';
+import { RolesGuard } from '../guards/roles.guard';
+import { Request } from "express";
 
 @Controller('team')
 export class TeamController {
@@ -37,6 +39,18 @@ export class TeamController {
       'IPlayerPublicService',
     );
   }
+
+  @Get()
+  @UseGuards(IsLogedInGuard)
+  async myTeam(@Req() req: Request) {
+    const userReq = req.user;
+    console.log(userReq);
+    if (!userReq) {
+      throw new HttpException('Access deny', 400);
+    }
+    return this.teamService.getMyTeamInfo(userReq);
+  }
+
   @Roles([RoleType.Admin])
   @UseGuards(RolesGuard)
   @Post('/create')

@@ -117,4 +117,9 @@ export class TeamRepository {
     console.log(test);
     return test;
   }
+
+  async getMyTeamInfo(user) {
+    const memberOfTeam = await this.teamMember.findOne({ playerId: user.id });
+    return this.getTeamInfo(memberOfTeam.teamId.toString());
+  }
 }

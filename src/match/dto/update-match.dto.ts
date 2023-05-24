@@ -1,13 +1,14 @@
 import { IsString, Length } from 'class-validator';
+import { ObjectId } from 'mongoose';
 
 export class UpdateMatchDto {
   @IsString()
   @Length(24)
-  oldTeam: string;
+  oldTeam: ObjectId | string;
 
   @IsString()
   @Length(24)
-  newTeam: string;
+  newTeam: ObjectId | string;
 
   @IsString()
   date: string;

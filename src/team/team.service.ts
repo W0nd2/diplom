@@ -48,4 +48,8 @@ export class TeamService {
   async deleteMemberFromTeam(teamId: ObjectId, playerId: ObjectId) {
     return this.teamRepository.deleteMemberFromTeam(teamId, playerId);
   }
+
+  async getMyTeamInfo(user) {
+    return this.teamRepository.getMyTeamInfo(user);
+  }
 }

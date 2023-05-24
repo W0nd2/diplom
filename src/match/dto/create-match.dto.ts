@@ -1,4 +1,5 @@
 import { IsDate, IsString, Length } from 'class-validator';
+import { ObjectId } from "mongoose";
 
 export class CreateMatchDto {
   @IsString()

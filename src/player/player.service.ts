@@ -3,7 +3,7 @@ import { PlayerRepository } from './player.repository';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { ObjectId } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
-import { Player } from './schemas/player.schema';
+import { Player, PlayerDocument } from "./schemas/player.schema";
 
 @Injectable()
 export class PlayerService {
@@ -12,8 +12,9 @@ export class PlayerService {
     private readonly playerRepository: PlayerRepository,
   ) {}
 
-  generateToken(user: Player): string {
+  generateToken(user: PlayerDocument): string {
     const payload = {
+      id: user._id,
       email: user.email,
       nickname: user.nickname,
     };

@@ -140,4 +140,30 @@ export class MatchController {
   ) {
     return this.matchService.getAllMatches(limit, offset);
   }
+
+  @Get(':date')
+  async getMatchByDate(@Param('date') date: string) {
+    return this.matchService.getMatchByDate(date);
+  }
+
+  @Post(':matchId/winner/:winnerId')
+  async setWinner(
+    @Param('matchId', ValidateMongooseIdPipe) matchId: ObjectId,
+    @Param('winnerId', ValidateMongooseIdPipe) winnerId: ObjectId,
+  ) {
+    const match = await this.matchService.getMatchById(matchId);
+    if (!match) {
+      throw new HttpException('Match with such id does not exists', 400);
+    }
+    const res = await this.matchService.setWinner(matchId, winnerId);
+    if (res) {
+      return {
+        res: 'Winner set successfully',
+      };
+    } else {
+      return {
+        res: 'Something went wrong',
+      };
+    }
+  }
 }

@@ -18,8 +18,8 @@ export class MatchService {
 
   async findTeamInMatch(
     date: string,
-    firstTeamId: string,
-    secondTeamId?: string,
+    firstTeamId: string | ObjectId,
+    secondTeamId?: string | ObjectId,
   ) {
     const firstTeam = await this.matchRepository.findTeamInMatch(
       date,
@@ -57,5 +57,13 @@ export class MatchService {
 
   async getAllMatches(limit: number, offset: number) {
     return this.matchRepository.getAllMatches(limit, offset);
+  }
+
+  async getMatchByDate(date: string) {
+    return this.matchRepository.getMatchByDate(date);
+  }
+
+  async setWinner(matchId: ObjectId, winnerId: ObjectId) {
+    return this.matchRepository.setWinner(matchId, winnerId);
   }
 }
