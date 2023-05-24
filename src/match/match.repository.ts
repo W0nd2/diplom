@@ -156,4 +156,54 @@ export class MatchRepository {
     console.log(updatedMatch);
     return updatedMatch;
   }
+
+  async getMatchInfo(matchId) {
+    return this.match.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(matchId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'teams',
+          localField: 'firstTeam',
+          foreignField: '_id',
+          as: 'firstTeam',
+        },
+      },
+      {
+        $lookup: {
+          from: 'teams',
+          localField: 'secondTeam',
+          foreignField: '_id',
+          as: 'secondTeam',
+        },
+      },
+      {
+        $unwind: {
+          path: '$firstTeam',
+        },
+      },
+      {
+        $unwind: {
+          path: '$secondTeam',
+        },
+      },
+      {
+        $lookup: {
+          from: 'teams',
+          localField: 'winner',
+          foreignField: '_id',
+          as: 'winner',
+        },
+      },
+      {
+        $unwind: {
+          path: '$winner',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]);
+  }
 }

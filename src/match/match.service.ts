@@ -66,4 +66,8 @@ export class MatchService {
   async setWinner(matchId: ObjectId, winnerId: ObjectId) {
     return this.matchRepository.setWinner(matchId, winnerId);
   }
+
+  async getMatchInfo(matchId) {
+    return this.matchRepository.getMatchInfo(matchId);
+  }
 }

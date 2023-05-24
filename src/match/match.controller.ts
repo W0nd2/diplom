@@ -146,6 +146,13 @@ export class MatchController {
     return this.matchService.getMatchByDate(date);
   }
 
+  @Get(':matchId/info')
+  async getMatchInfo(
+    @Param('matchId', ValidateMongooseIdPipe) matchId: ObjectId,
+  ) {
+    return this.matchService.getMatchInfo(matchId);
+  }
+
   @Post(':matchId/winner/:winnerId')
   async setWinner(
     @Param('matchId', ValidateMongooseIdPipe) matchId: ObjectId,
