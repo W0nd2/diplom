@@ -74,6 +74,15 @@ export class TeamRepository {
           as: 'members',
         },
       },
+      {
+        $group: {
+          _id: '$_id',
+          name: { $first: '$name' },
+          //teammembers: { $push: '$teammembers' },
+          members: { $push: { $arrayElemAt: ['$members', 0] } },
+          __v: { $first: '$__v' },
+        },
+      },
     ]);
     console.log(teamInfo);
     return {
