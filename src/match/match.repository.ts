@@ -40,7 +40,9 @@ export class MatchRepository {
   }
 
   async getAllMatches(limit: number, offset: number) {
-    return this.match
+    const matchesAmount = (await this.match.find({})).length;
+    //const allMatches = await this.match.find().skip(offset).limit(limit);
+    const allMatches = await this.match
       .aggregate([
         {
           $lookup: {
@@ -71,6 +73,19 @@ export class MatchRepository {
       ])
       .skip(offset)
       .limit(limit);
+    return {
+      limit: limit,
+      offset: offset,
+      total: matchesAmount,
+      teams: allMatches.map((match) => {
+        return {
+          id: match._id,
+          startDate: match.startDate,
+          firstTeam: match.firstTeam,
+          secondTeam: match.secondTeam,
+        };
+      }),
+    };
   }
 
   async getMatchById(matchId: ObjectId) {

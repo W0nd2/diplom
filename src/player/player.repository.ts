@@ -45,6 +45,7 @@ export class PlayerRepository {
       total: playersAmount,
       players: allPlayers.map((player) => {
         return {
+          _id: player.id,
           nickname: player.nickname,
           email: player.email,
         };

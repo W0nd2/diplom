@@ -63,7 +63,7 @@ export class TeamController {
     return { message: `Team with name ${newTeam.name} was created success` };
   }
 
-  @Get()
+  @Get('all')
   async getAllTeams(
     @Query('limit', ToNumberPipe) limitQ = 9,
     @Query('offset', ToNumberPipe) offsetQ = 0,
