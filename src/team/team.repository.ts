@@ -46,56 +46,47 @@ export class TeamRepository {
   }
 
   async getTeamInfo(teamId: string) {
-    const members = await this.teamMember.aggregate([
+    const teamInfo = await this.team.aggregate([
       {
         $match: {
-          teamId: new mongoose.Types.ObjectId(teamId),
+          _id: new mongoose.Types.ObjectId(teamId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'teammembers',
+          localField: '_id',
+          foreignField: 'teamId',
+          as: 'teammembers',
+        },
+      },
+      {
+        $unwind: {
+          path: '$teammembers',
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
         $lookup: {
           from: 'players',
-          localField: 'playerId',
+          localField: 'teammembers.playerId',
           foreignField: '_id',
-          as: 'players',
-        },
-      },
-      {
-        $unwind: {
-          path: '$players',
-        },
-      },
-      {
-        $lookup: {
-          from: 'teams',
-          localField: 'teamId',
-          foreignField: '_id',
-          as: 'team',
-        },
-      },
-      {
-        $unwind: {
-          path: '$team',
-        },
-      },
-      {
-        $project: {
-          team: 1,
-          players: 1,
+          as: 'members',
         },
       },
     ]);
+    console.log(teamInfo);
     return {
-      total: members.length,
+      total: teamInfo[0].members.length,
       team: {
-        id: members[0]?.team._id,
-        name: members[0]?.team.name,
+        id: teamInfo[0]._id,
+        name: teamInfo[0].name,
       },
-      members: members.map((member) => {
+      members: teamInfo[0].members.map((member) => {
         return {
-          id: member.players._id,
-          nickname: member.players.nickname,
-          email: member.players.email,
+          id: member._id,
+          nickname: member.nickname,
+          email: member.email,
         };
       }),
     };
