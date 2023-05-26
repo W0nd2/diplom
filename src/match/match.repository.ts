@@ -73,6 +73,7 @@ export class MatchRepository {
       ])
       .skip(offset)
       .limit(limit);
+    console.log(allMatches);
     return {
       limit: limit,
       offset: offset,
@@ -83,6 +84,7 @@ export class MatchRepository {
           startDate: match.startDate,
           firstTeam: match.firstTeam,
           secondTeam: match.secondTeam,
+          winner: match.winner,
         };
       }),
     };
